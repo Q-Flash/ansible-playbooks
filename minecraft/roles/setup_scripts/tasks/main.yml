@@ -10,20 +10,8 @@
     mode: 0755
   loop:
     - "{{ minecraft_base_dir }}"
-    - "{{ minecraft_scripts_dir }}"
     - "{{ minecraft_server_dir }}"
   become: yes
- 
-- name: Copy shell scripts to directory
-  copy: 
-    src: "{{ item }}"
-    dest: "{{ minecraft_scripts_dir }}/{{ item }}"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: 0774
-  loop:
-    - start.sh
-    - stop.sh
 
 - name: Create Minecraft server files
   template:
@@ -42,6 +30,17 @@
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     mode: 0664
+
+- name: Copy shell scripts to directory
+  copy: 
+    src: "{{ item }}"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0774
+  loop:
+    - start.sh
+    - stop.sh
 
 - name: Copy systemd file for the minecraft service
   template:
