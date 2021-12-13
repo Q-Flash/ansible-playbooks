@@ -4,6 +4,8 @@
 - name: Create required directories
   file:
     path: "{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
     state: directory
     mode: 0755
   loop:
