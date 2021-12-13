@@ -1,0 +1,26 @@
+---
+# Setup scripts
+
+- name: Create scripts directory
+  file:
+    path: {{ minecraft_scripts_dir }}
+    state: directory
+    mode: 0755
+ 
+- name: Copy shell scripts to directory
+  copy: 
+    src: {{ item }}
+    dest: {{ minecraft_scripts_dir }}
+    owner: {{ minecraft_user }}
+    group: {{ minecraft_group }}
+    mode: 0774
+  loop:
+    - start.sh
+    - stop.sh
+    - install.sh
+
+- name: Copy systemd file for the minecraft service
+  copy:
+    src: minecraft.service
+    dest: '/usr/lib/systemd/system/minecraft.service'
+    owner: {{ 
