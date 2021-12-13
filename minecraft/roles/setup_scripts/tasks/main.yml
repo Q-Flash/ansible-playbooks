@@ -9,6 +9,7 @@
   loop:
     - "{{ minecraft_base_dir }}"
     - "{{ minecraft_scripts_dir }}"
+  become: yes
  
 - name: Copy shell scripts to directory
   copy: 
