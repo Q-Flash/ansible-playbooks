@@ -23,4 +23,16 @@
   copy:
     src: minecraft.service
     dest: '/usr/lib/systemd/system/minecraft.service'
-    owner: {{ 
+    owner: {{ minecraft_user }}
+    group: {{ minecraft_group }}
+    mode: 0664
+
+- name: Daemon-reload
+  systemd:
+    daemon_reload: yes
+
+- name: Enable Minecraft Service
+  systemd:
+    enabled: yes
+
+
