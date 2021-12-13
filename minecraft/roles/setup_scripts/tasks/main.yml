@@ -44,7 +44,7 @@
 
 - name: Copy systemd file for the minecraft service
   template:
-    src: "{{ item }}"
+    src: "{{ item }}.j2"
     dest: '/usr/lib/systemd/system/{{ item }}'
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
