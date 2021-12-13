@@ -1,0 +1,18 @@
+[Unit]
+Description=Minecraft Server
+After=sshd.service
+
+[Service]
+Type=forking
+User={{ minecraft_user }}
+ExecStart=/bin/bash /opt/minecraft/server/start.sh
+ExecStop=/bin/bash /opt/minecraft/server/stop.sh
+# PIDFile=/opt/minecraft/server/minecraft.pid
+
+Restart=on-failure
+# Disabled startup timeout to prevent on-failure looping
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+
