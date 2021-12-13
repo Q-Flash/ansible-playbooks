@@ -11,19 +11,37 @@
   loop:
     - "{{ minecraft_base_dir }}"
     - "{{ minecraft_scripts_dir }}"
+    - "{{ minecraft_server_dir }}"
   become: yes
  
 - name: Copy shell scripts to directory
   copy: 
     src: "{{ item }}"
-    dest: "{{ minecraft_scripts_dir }}/"
+    dest: "{{ minecraft_scripts_dir }}/{{ item }}"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     mode: 0774
   loop:
     - start.sh
     - stop.sh
-    - install.sh
+
+- name: Create Minecraft server files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+  loop:
+    - server.properties
+
+- name: Place eula file
+  copy: 
+    src: "eula.txt"
+    dest: "{{ minecraft_server_dir }}/eula.txt"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
 
 - name: Copy systemd file for the minecraft service
   copy:
