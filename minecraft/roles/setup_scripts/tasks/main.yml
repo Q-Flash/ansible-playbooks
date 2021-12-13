@@ -14,7 +14,7 @@
 - name: Copy shell scripts to directory
   copy: 
     src: "{{ item }}"
-    dest: "{{ minecraft_scripts_dir }}"
+    dest: "{{ minecraft_scripts_dir }}/"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     mode: 0774
