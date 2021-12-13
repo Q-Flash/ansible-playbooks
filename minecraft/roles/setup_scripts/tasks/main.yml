@@ -55,12 +55,13 @@
 
 - name: Daemon-reload
   systemd:
+    name: 'minecraft'
     daemon_reload: yes
-  become: yes
-
-- name: Enable Minecraft Service
-  systemd:
     enabled: yes
   become: yes
+
+# - name: Enable Minecraft Service
+#   systemd:
+#   become: yes
 
 
