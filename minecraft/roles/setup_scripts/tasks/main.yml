@@ -56,9 +56,11 @@
 - name: Daemon-reload
   systemd:
     daemon_reload: yes
+  become: yes
 
 - name: Enable Minecraft Service
   systemd:
     enabled: yes
+  become: yes
 
 
