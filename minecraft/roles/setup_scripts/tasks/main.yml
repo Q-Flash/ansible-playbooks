@@ -51,6 +51,7 @@
     mode: 0664
   loop:
     - minecraft.service
+  become: yes
 
 - name: Daemon-reload
   systemd:
