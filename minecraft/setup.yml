@@ -1,0 +1,6 @@
+---
+# Setup or update minecraft scripts on server
+
+- hosts: minecraft_servers
+  roles:
+  - role: setup_scripts
