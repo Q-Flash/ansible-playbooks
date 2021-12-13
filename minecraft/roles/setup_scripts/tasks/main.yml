@@ -3,16 +3,16 @@
 
 - name: Create scripts directory
   file:
-    path: {{ minecraft_scripts_dir }}
+    path: "{{ minecraft_scripts_dir }}"
     state: directory
     mode: 0755
  
 - name: Copy shell scripts to directory
   copy: 
-    src: {{ item }}
-    dest: {{ minecraft_scripts_dir }}
-    owner: {{ minecraft_user }}
-    group: {{ minecraft_group }}
+    src: "{{ item }}"
+    dest: "{{ minecraft_scripts_dir }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
     mode: 0774
   loop:
     - start.sh
@@ -23,8 +23,8 @@
   copy:
     src: minecraft.service
     dest: '/usr/lib/systemd/system/minecraft.service'
-    owner: {{ minecraft_user }}
-    group: {{ minecraft_group }}
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
     mode: 0664
 
 - name: Daemon-reload
