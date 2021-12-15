@@ -1,6 +1,11 @@
 ---
 # Setup scripts
 
+- name: Install Java 17
+  apt:
+    name: openjdk-17-jre-headless
+    update_cache: yes
+
 - name: Ensure service is stopped
   systemd:
     name: 'minecraft'
