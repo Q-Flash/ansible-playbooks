@@ -45,7 +45,6 @@
 - name: Obtain latest MC version
   shell:
     cmd: curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json | python3 -c "import sys, json; print(json.load(sys.stdin)['latest']['release'])"
-    chdir: "{{ minecraft_server_dir }}"
   register: curl_output
   when: minecraft_version is undefined
 
@@ -63,11 +62,25 @@
   debug:
     msg: "Download url: {{ get_download_curl.stdout }}"
 
-# - name: Download server jar
-#   shell:
-#     cmd: wget 
+- name: Download server jar
+  shell:
+    cmd: wget -O server-{{ minecraft_version }}.jar {{ get_download_curl.stdout }}
+    chdir: "{{ minecraft_server_dir }}"
 
-  
+- name: Change server jar permissions
+  file:
+    path: "{{ minecraft_server_dir }}/server-{{ minecraft_version }}.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+
+- name: Copy and rename downloaded server jar
+  copy:
+    src: "{{ minecraft_server_dir }}/server-{{ minecraft_version }}.jar"
+    dest: "{{ minecraft_server_dir }}/server.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
 
 - name: Copy systemd file for the minecraft service
   template:
