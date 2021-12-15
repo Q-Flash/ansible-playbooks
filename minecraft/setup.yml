@@ -2,5 +2,7 @@
 # Setup or update minecraft scripts on server
 
 - hosts: minecraft_servers
+  vars:
+    ansible_host_key_checking: false
   roles:
   - role: setup_scripts
