@@ -54,11 +54,19 @@
     minecraft_version: "{{ curl_output.stdout }}"
   when: minecraft_version is undefined
 
-- name: Print version
-  debug:
-    msg: "minecraft_version: {{ minecraft_version }}\nCurled version: {{ curl_output.stdout }}"
+- name: Get server jar download URL
+  shell:
+    cmd: curl https://mcversions.net/download/{{ minecraft_version }} --silent | grep "server.jar" | sed 's/.*\(https:\/\/.*server.jar\).*/\1/g'
+  register: get_download_curl
 
-# - name: Download Minecraft server jar
+- name: Print download url
+  debug:
+    msg: "Download url: {{ get_download_curl.output }}"
+
+# - name: Download server jar
+#   shell:
+#     cmd: wget 
+
   
 
 - name: Copy systemd file for the minecraft service
