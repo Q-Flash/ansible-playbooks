@@ -5,6 +5,7 @@
   apt:
     name: openjdk-17-jre-headless
     update_cache: yes
+  become: yes
 
 - name: Ensure service is stopped
   systemd:
