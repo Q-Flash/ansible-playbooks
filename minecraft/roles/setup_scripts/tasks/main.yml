@@ -61,7 +61,7 @@
 
 - name: Print download url
   debug:
-    msg: "Download url: {{ get_download_curl.output }}"
+    msg: "Download url: {{ get_download_curl.stdout }}"
 
 # - name: Download server jar
 #   shell:
