@@ -1,0 +1,118 @@
+---
+# Setup scripts
+
+- name: Install Java 17
+  apt:
+    name: openjdk-17-jre-headless
+    update_cache: yes
+  become: yes
+
+- name: Ensure service is stopped
+  systemd:
+    name: 'minecraft'
+    state: stopped
+  become: yes
+  ignore_errors: yes #This will fail on first build because the service doesn't exist yet
+
+- name: Create required directories
+  file:
+    path: "{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    state: directory
+    mode: 0755
+  loop:
+    - "{{ minecraft_base_dir }}"
+    - "{{ minecraft_server_dir }}"
+  become: yes
+
+- name: Create Minecraft server files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+  loop:
+    - server.properties
+    - whitelist.json
+
+- name: Place eula file
+  copy: 
+    src: "eula.txt"
+    dest: "{{ minecraft_server_dir }}/eula.txt"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+
+- name: Copy shell scripts to directory
+  copy: 
+    src: "{{ item }}"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0774
+  loop:
+    - start.sh
+    - stop.sh
+
+- name: Obtain latest MC version
+  shell:
+    cmd: curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json | python3 -c "import sys, json; print(json.load(sys.stdin)['latest']['release'])"
+  register: curl_output
+  when: minecraft_version is undefined
+
+- name: Set minecraft_version to latest if not already defined
+  set_fact:
+    minecraft_version: "{{ curl_output.stdout }}"
+  when: minecraft_version is undefined
+
+- name: Get server jar download URL
+  shell:
+    cmd: curl https://mcversions.net/download/{{ minecraft_version }} --silent | grep "server.jar" | sed 's/.*\(https:\/\/.*server.jar\).*/\1/g'
+  register: get_download_curl
+
+- name: Print download url
+  debug:
+    msg: "Download url: {{ get_download_curl.stdout }}"
+
+- name: Download server jar
+  shell:
+    cmd: wget -O server-{{ minecraft_version }}.jar {{ get_download_curl.stdout }}
+    chdir: "{{ minecraft_server_dir }}"
+
+- name: Change server jar permissions
+  file:
+    path: "{{ minecraft_server_dir }}/server-{{ minecraft_version }}.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+
+- name: Copy and rename downloaded server jar
+  copy:
+    src: "{{ minecraft_server_dir }}/server-{{ minecraft_version }}.jar"
+    remote_src: yes
+    dest: "{{ minecraft_server_dir }}/server.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+
+- name: Copy systemd file for the minecraft service
+  template:
+    src: "{{ item }}.j2"
+    dest: '/usr/lib/systemd/system/{{ item }}'
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
+  loop:
+    - minecraft.service
+  become: yes
+
+- name: Start Minecraft service
+  systemd:
+    name: 'minecraft'
+    daemon_reload: yes
+    enabled: yes
+    state: started
+  become: yes
+
