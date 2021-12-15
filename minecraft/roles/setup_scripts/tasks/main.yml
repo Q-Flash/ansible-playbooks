@@ -42,6 +42,25 @@
     - start.sh
     - stop.sh
 
+- name: Obtain latest MC version
+  shell:
+    cmd: curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json | python3 -c "import sys, json; print(json.load(sys.stdin)['latest']['release'])"
+    chdir: "{{ minecraft_server_dir }}"
+  register: curl_output
+  when: minecraft_version is undefined
+
+- name: Set minecraft_version to latest if not already defined
+  set_fact:
+    minecraft_version: "{{ curl_output.stdout }}"
+  when: minecraft_version is undefined
+
+- name: Print version
+  debug:
+    msg: "minecraft_version: {{ minecraft_version }}\nCurled version: {{ curl_output.stdout }}"
+
+# - name: Download Minecraft server jar
+  
+
 - name: Copy systemd file for the minecraft service
   template:
     src: "{{ item }}.j2"
