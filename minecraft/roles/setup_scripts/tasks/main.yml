@@ -77,6 +77,7 @@
 - name: Copy and rename downloaded server jar
   copy:
     src: "{{ minecraft_server_dir }}/server-{{ minecraft_version }}.jar"
+    remote_src: yes
     dest: "{{ minecraft_server_dir }}/server.jar"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
