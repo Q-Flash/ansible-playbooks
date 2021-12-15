@@ -34,6 +34,7 @@
     mode: 0664
   loop:
     - server.properties
+    - whitelist.json
 
 - name: Place eula file
   copy: 
