@@ -1,8 +1,8 @@
 [
-  {% for item in server_whitelist_entries %}
+{% for item in server_whitelist_entries %}
   {
     "uuid": "{{ item.uuid }}",
     "name": "{{ item.username }}"
-  }
-  {% endfor %}
+  }{{ "," if not loop.last }}
+{% endfor %}
 ]
