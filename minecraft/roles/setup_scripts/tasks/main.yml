@@ -1,6 +1,12 @@
 ---
 # Setup scripts
 
+# - name: Ensure service is stopped
+#   systemd:
+#     name: 'minecraft'
+#     enabled: no
+#   become: yes
+
 - name: Create required directories
   file:
     path: "{{ item }}"
