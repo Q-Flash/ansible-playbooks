@@ -3,6 +3,7 @@
 - name: Get apt repository updates
   apt:
     update_cache: yes
+  become: yes
 
 - name: Install packages to allow apt to use a repository over HTTPS
   apt:
