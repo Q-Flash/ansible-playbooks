@@ -1,9 +1,13 @@
 ---
+
+- name: Get apt repository updates
+  apt:
+    update_cache: yes
+
 - name: Install packages to allow apt to use a repository over HTTPS
   apt:
     pkg: "{{ item }}"
     state: present
-    update_cache: yes
   loop:
     - apt-transport-https
     - ca-certificates
