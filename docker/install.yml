@@ -1,0 +1,8 @@
+---
+# Install/Update Docker on all servers
+
+- hosts: docker_servers
+  vars:
+    ansible_host_key_checking: false
+  roles:
+  - role: install
