@@ -1,5 +1,5 @@
 [
-{% for player in players.items() if op_level > 0 %}
+{% for player in players if player.op_level > 0 %}
   {
     "name": "{{ player.username }}",
     "uuid": "{{ player.uuid }}",
