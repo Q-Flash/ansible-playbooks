@@ -36,6 +36,7 @@
   loop:
     - server.properties
     - whitelist.json
+    - ops.json
 
 - name: Place eula file
   copy: 
