@@ -1,8 +1,8 @@
 [
-{% for user in server_whitelist_entries %}
+{% for obj, player in players.items() if player.whitelisted %}
   {
-    "uuid": "{{ user.uuid }}",
-    "name": "{{ user.username }}"
+    "name": "{{ player.username }}",
+    "uuid": "{{ player.uuid }}"
   }{{ "," if not loop.last else "" }}
 {% endfor %}
 ]
