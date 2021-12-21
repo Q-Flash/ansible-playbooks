@@ -1,0 +1,10 @@
+[
+{% for player in players if op_level > 0 %}
+  {
+    "name": "{{ player.username }}",
+    "uuid": "{{ player.uuid }}",
+    "level": {{ player.op_level }},
+    "bypassesPlayerLimit": true
+  }{{ "," if not loop.last else "" }}
+{% endfor %}
+]
