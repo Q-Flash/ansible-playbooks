@@ -26,7 +26,7 @@
     - "{{ minecraft_server_dir }}"
   become: yes
 
-- name: Create Minecraft server files
+- name: Place Minecraft server files (from templates)
   template:
     src: "{{ item }}.j2"
     dest: "{{ minecraft_server_dir }}/{{ item }}"
@@ -37,16 +37,19 @@
     - server.properties
     - whitelist.json
     - ops.json
+    - start.sh
 
-- name: Place eula file
+- name: Place other Minecraft files
   copy: 
-    src: "eula.txt"
-    dest: "{{ minecraft_server_dir }}/eula.txt"
+    src: "{{ item }}"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     mode: 0664
+  loop:
+    - stop.sh
 
-- name: Copy shell scripts to directory
+- name: Place server stop script 
   copy: 
     src: "{{ item }}"
     dest: "{{ minecraft_server_dir }}/{{ item }}"
@@ -54,8 +57,17 @@
     group: "{{ minecraft_group }}"
     mode: 0774
   loop:
-    - start.sh
     - stop.sh
+
+- name: lace server start script 
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ minecraft_server_dir }}/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0774
+  loop:
+    - start.sh
 
 - name: Obtain latest MC version
   shell:
