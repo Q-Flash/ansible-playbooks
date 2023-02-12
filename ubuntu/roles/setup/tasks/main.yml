@@ -96,8 +96,8 @@
 # Allow user to sudo without password prompt
 - name: Add user to sudoers
   community.general.sudoers:
-    name: "{{ user }}"
-    user: "{{ user }}"
+    name: "{{ ubuntu_user }}"
+    user: "{{ ubuntu_user }}"
     commands: ALL
     nopassword: true
   become: yes
