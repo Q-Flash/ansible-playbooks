@@ -93,11 +93,11 @@
 #   become: yes
 
 
-# Allow default "mubarak" user to sudo without password prompt
+# Allow user to sudo without password prompt
 - name: Add user to sudoers
   community.general.sudoers:
-    name: "mubarak"
-    user: "mubarak"
+    name: "{{ user }}"
+    user: "{{ user }}"
     commands: ALL
     nopassword: true
   become: yes
