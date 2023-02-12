@@ -1,0 +1,103 @@
+---
+
+- name: Set VM Hostname
+  hostname:
+    name: "{{ ansible_host }}"
+    # use: "debian"
+  become: yes
+
+- name: Configure sshd
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regex: "^#.*{{item.key}}"
+    line: "{{item.key}} {{item.value}}"
+    state: present
+  loop:
+    - { key: "PermitRootLogin", value: "no" }
+    - { key: "PasswordAuthentication", value: "no" } 
+  notify:
+    - restart ssh
+  become: yes
+
+# For this next section, we want apply any increases in disk size to the VM
+# Default is generally 8GB as at time of writing, so any new VM provisioned will likely be given more
+# Steps taken from: https://bookstack.qflash.org/books/proxmox/page/increase-vm-disk-size
+
+- name: Get disk device name (e.g /dev/sda3)
+  shell:
+    cmd: lvmdiskscan -l | grep "/dev/" | awk '{print $1}'
+  become: yes
+  register: device_info
+
+- name: Get disk device name (e.g /dev/sda3)
+  shell:
+    cmd: df --type=ext4 | grep '/$' | awk '{print $1}'
+  become: yes
+  register: filesystem_name_output
+
+- name: Set variables for partition
+  set_fact:
+    device_name: "{{ device_info.stdout[:8] }}"
+    device_number: "{{ device_info.stdout[-1:] }}"
+    filesystem_name: "{{ filesystem_name_output.stdout }}"
+
+- name: Debug
+  debug: 
+    msg: 
+      - "device_name = {{ device_name }}"
+      - "device_number = {{ device_number }}"
+      - "filesystem_name = {{ filesystem_name }}"
+
+- name: Increase Partition Size
+  shell:
+    cmd: "growpart {{ device_name }} {{ device_number }}"
+  ignore_errors: true
+  become: yes
+
+- name: Resize Volume
+  shell:
+    cmd: "pvresize {{ device_name }}{{ device_number }}"
+  become: yes
+
+- name: Extend the logical volume and resize
+  shell:
+    cmd: "lvextend -l +100%FREE {{ filesystem_name }} --resize"
+  become: yes
+
+# - name: Grow partition until maximum
+#   parted:
+#     device: "/dev/sda"
+#     number: "3"
+#     label: gpt
+#     state: present
+#   become: yes
+
+# - name: Resize existing pv
+#   community.general.lvg:
+#     vg: "ubuntu-vg"
+#     pvs: "/dev/sda3"
+#     pvresize: yes
+#   become: yes
+
+# - name: Extend the logical volume to consume all remaining space in the volume group
+#   community.general.lvol:
+#     vg: "ubuntu-vg"
+#     lv: "ubuntu-lv"
+#     size: +100%FREE
+#     resizefs: true
+#   become: yes
+
+# - name: Increase Partition Size
+#   shell:
+#     cmd: "growpart {{ disk_info.stdout[:-1] }} {{ disk_info.stdout[-8:] }}" 
+#   become: yes
+
+
+# Allow default "mubarak" user to sudo without password prompt
+- name: Add user to sudoers
+  community.general.sudoers:
+    name: "mubarak"
+    user: "mubarak"
+    commands: ALL
+    nopassword: true
+  become: yes

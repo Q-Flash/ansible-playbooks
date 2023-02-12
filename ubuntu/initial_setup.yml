@@ -1,0 +1,13 @@
+---
+# Basic Ubuntu setup such as:
+# - Set Hostname
+# - Disable Password Login
+# - Disable Root Login
+# - Enable sudo for user with no password
+# - Resize disk (where applicable)
+
+- hosts: ubuntu_servers
+  vars:
+    ansible_host_key_checking: false
+  roles:
+  - role: setup
