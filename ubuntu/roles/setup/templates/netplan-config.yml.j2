@@ -5,8 +5,11 @@ network:
     {{ interface_name }}:
       dhcp4: no
       addresses:
-        - {{ ipv4_address }}/24
-        - {{ ipv6_address }}/64
+        - {{ ipv4_address }}
+        - {{ ipv6_address }}
+      routes:
+        - to: default
+          via: {{ gateway_ip }}
       nameservers:
         addresses:
           - {{ dns_server_ip }}

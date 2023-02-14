@@ -46,6 +46,18 @@
     state: present
     key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
   become: yes
+  
+# Allow user to sudo without password prompt
+- name: Add user to sudoers
+  community.general.sudoers:
+    name: "{{ ubuntu_user }}"
+    user: "{{ ubuntu_user }}"
+    commands: ALL
+    nopassword: true
+  become: yes
+
+
+## Network Setup
 
 - name: Get interface name
   shell:
@@ -65,8 +77,8 @@
 - name: Set variables for partition
   set_fact:
     interface_name: "{{ interface_result.stdout }}"
-    ipv4_address: "{{ ipv4_result.stdout[:-3] }}"
-    ipv6_address: "{{ ipv6_result.stdout[:-3] }}"
+    ipv4_address: "{{ ipv4_result.stdout }}"
+    ipv6_address: "{{ ipv6_result.stdout }}"
 
 - name: Debug
   debug: 
@@ -160,12 +172,3 @@
 #     cmd: "growpart {{ disk_info.stdout[:-1] }} {{ disk_info.stdout[-8:] }}" 
 #   become: yes
 
-
-# Allow user to sudo without password prompt
-- name: Add user to sudoers
-  community.general.sudoers:
-    name: "{{ ubuntu_user }}"
-    user: "{{ ubuntu_user }}"
-    commands: ALL
-    nopassword: true
-  become: yes
