@@ -1,5 +1,18 @@
 ---
 
+- name: Get apt repository updates
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install general-use packages
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  loop:
+    - net-tools
+  become: yes
+
 - name: Set VM Hostname
   hostname:
     name: "{{ ansible_host }}"
@@ -18,6 +31,61 @@
   notify:
     - restart ssh
   become: yes
+
+# Create and configure personal user 
+- name: Create and configure personal user
+  ansible.builtin.user:
+    name: "{{ ubuntu_user }}"
+    # group: "{{ ubuntu_user }}"
+    shell: /bin/bash
+  become: yes
+
+- name: Set authorized key
+  ansible.posix.authorized_key:
+    user: "{{ ubuntu_user }}"
+    state: present
+    key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+  become: yes
+
+- name: Get interface name
+  shell:
+    cmd: ifconfig -a | awk '/^[a-z]/{ifname=substr($1,0,length($1)-1); if (ifname != "lo") print ifname }'
+  register: interface_result
+
+- name: Get IPv4 Address
+  shell:
+    cmd: "ip -4 addr show {{ interface_result.stdout }} | awk '/inet/{print $2}'"
+  register: ipv4_result
+
+- name: Get IPv6 Address
+  shell:
+    cmd: "ip -6 addr show {{ interface_result.stdout }} | awk '/inet/{print $2}'"
+  register: ipv6_result
+
+- name: Set variables for partition
+  set_fact:
+    interface_name: "{{ interface_result.stdout }}"
+    ipv4_address: "{{ ipv4_result.stdout[:-3] }}"
+    ipv6_address: "{{ ipv6_result.stdout[:-3] }}"
+
+- name: Debug
+  debug: 
+    msg: 
+      - "interface_name = {{ interface_name }}"
+      - "ipv4_address = {{ ipv4_address }}"
+      - "ipv6_address = {{ ipv6_address }}"
+
+- name: Configure DNS Server and Static IP 
+  template:
+    src: "netplan-config.yml.j2"
+    dest: "/etc/netplan/00-installer-config.yaml"
+    owner: "root"
+    group: "root"
+    mode: 0664
+  become: yes
+  notify:
+    - apply netplan
+
 
 # For this next section, we want apply any increases in disk size to the VM
 # Default is generally 8GB as at time of writing, so any new VM provisioned will likely be given more

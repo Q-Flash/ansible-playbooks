@@ -4,3 +4,8 @@
     name: sshd
     state: restarted
   become: yes
+
+- name: apply netplan
+  command: netplan apply
+  become: yes
+

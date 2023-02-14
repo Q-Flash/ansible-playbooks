@@ -1,0 +1,12 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ interface_name }}:
+      dhcp4: no
+      addresses:
+        - {{ ipv4_address }}/24
+        - {{ ipv6_address }}/64
+      nameservers:
+        addresses:
+          - {{ dns_server_ip }}
