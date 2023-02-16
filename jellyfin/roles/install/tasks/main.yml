@@ -1,0 +1,13 @@
+---
+
+- name: Setup Jellyfin User
+  include_role:
+    name: install
+    tasks_from: user_setup
+
+- name: Setup NFS Directory
+  include_role:
+    name: install
+    tasks_from: nfs_setup
+
+

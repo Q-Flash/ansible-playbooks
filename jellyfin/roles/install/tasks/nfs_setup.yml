@@ -1,0 +1,22 @@
+---
+
+- name: Create mount directories
+  file:
+    path: "{{ item }}"
+    owner: "{{ jellyfin_admin_user }}"
+    group: "{{ jellyfin_admin_group }}"
+    state: directory
+    mode: 0750
+  loop:
+    - "/mnt"
+    - "{{ jellyfin_mount_dir }}"
+  become: yes
+
+- name: Mount NFS volume
+  ansible.posix.mount:
+    src: "{{ nfs_server_ip }}:{{ nfs_jellyfin_mount_dir}}"
+    path: "{{ jellyfin_mount_dir }}"
+    opts: "defaults"
+    state: mounted
+    fstype: nfs
+  become: yes

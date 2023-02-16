@@ -1,0 +1,16 @@
+---
+
+- name: Create Jellyfin Admin Group
+  group:
+    name: "{{ jellyfin_admin_group }}"
+    state: present
+    gid: "{{ jellyfin_admin_guid }}"
+  become: yes
+
+- name: Create and configure Jellyfin Admin User
+  user:
+    name: "{{ jellyfin_admin_user }}"
+    uid: "{{ jellyfin_admin_uid }}"
+    group: "{{ jellyfin_admin_group }}"
+    shell: /bin/bash
+  become: yes

@@ -11,6 +11,7 @@
     state: present
   loop:
     - net-tools
+    - nfs-common
   become: yes
 
 - name: Set VM Hostname

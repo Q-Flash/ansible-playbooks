@@ -1,0 +1,7 @@
+---
+
+
+- hosts: jellyfin_servers
+  roles:
+    - role: '../../ubuntu/roles/setup'
+    - role: install
