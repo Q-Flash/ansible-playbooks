@@ -4,7 +4,7 @@
   group:
     name: "{{ jellyfin_admin_group }}"
     state: present
-    gid: "{{ jellyfin_admin_guid }}"
+    gid: "{{ jellyfin_admin_gid }}"
   become: yes
 
 - name: Create and configure Jellyfin Admin User

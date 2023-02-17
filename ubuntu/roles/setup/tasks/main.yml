@@ -12,6 +12,7 @@
   loop:
     - net-tools
     - nfs-common
+    - tree
   become: yes
 
 - name: Set VM Hostname
@@ -35,7 +36,7 @@
 
 # Create and configure personal user 
 - name: Create and configure personal user
-  ansible.builtin.user:
+  user:
     name: "{{ ubuntu_user }}"
     # group: "{{ ubuntu_user }}"
     shell: /bin/bash

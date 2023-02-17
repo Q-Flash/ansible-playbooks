@@ -10,4 +10,45 @@
     name: install
     tasks_from: nfs_setup
 
+- name: Setup apt repository for Jellyfin
+  include_role:
+    name: install
+    tasks_from: apt_repo_setup
+
+- name: Install Jellyfin
+  apt:
+    pkg: "jellyfin"
+    state: present
+  become: yes
+
+- name: Override Jellyfin systemd config
+  template:
+    src: "jellyfin.service.conf.j2"
+    dest: "/etc/systemd/system/jellyfin.service.d/jellyfin.service.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  become: yes
+  notify:
+    - restart jellyfin
+
+- name: Configure Jellyfin Environment File
+  template:
+    src: "jellyfin.env.j2"
+    dest: "/etc/default/jellyfin"
+    owner: "root"
+    group: "{{ jellyfin_admin_group }}"
+    mode: 0664
+  become: yes
+  notify:
+    - restart jellyfin
+
+- name: Start Jellyfin
+  systemd:
+    name: jellyfin
+    state: started
+    enabled: true
+  become: yes
+
+
 

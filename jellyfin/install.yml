@@ -1,5 +1,6 @@
 ---
 
+# UNCOMMENT UBUNTU ROLE BEFORE PUSHING TO MASTER
 
 - hosts: jellyfin_servers
   roles:

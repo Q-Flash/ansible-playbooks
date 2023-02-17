@@ -6,7 +6,7 @@
     owner: "{{ jellyfin_admin_user }}"
     group: "{{ jellyfin_admin_group }}"
     state: directory
-    mode: 0750
+    mode: 0755
   loop:
     - "/mnt"
     - "{{ jellyfin_mount_dir }}"

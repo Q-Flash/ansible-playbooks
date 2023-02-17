@@ -1,0 +1,46 @@
+---
+
+- name: Install Pre-req packages
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  loop:
+    - curl
+    - gnupg
+    - software-properties-common
+  become: yes
+
+- name: Enable the Universe repository
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop:
+    - "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+    - "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates universe"
+    - "deb http://security.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe"
+  become: yes
+
+- name: Download Jellyfin APT Repo Key
+  shell:
+    cmd: curl -fsSL https://repo.jellyfin.org/jellyfin_team.gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/jellyfin.gpg
+  become: yes
+
+- name: Get DEB architecture
+  shell: dpkg --print-architecture
+  register: deb_arch
+
+# The ~ after the gpg file name is required...idk why
+- name: Add Jellyfin repo
+  apt_repository:
+    filename: jellyfin
+    # repo: "deb [arch={{ deb_arch.stdout }}] https://repo.jellyfin.org/ubuntu {{ ansible_distribution_release }} main"
+    repo: "deb [arch={{ deb_arch.stdout }} signed-by=/etc/apt/keyrings/jellyfin.gpg] https://repo.jellyfin.org/ubuntu {{ ansible_distribution_release }} main"
+    update_cache: false
+  become: yes
+
+- name: Update repository cache
+  apt:
+    update_cache: yes
+  become: yes
+
+
