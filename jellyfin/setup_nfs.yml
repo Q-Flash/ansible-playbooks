@@ -1,0 +1,13 @@
+---
+
+- hosts: "{{ media_server_host }}"
+  vars:
+    ansible_host_key_checking: false
+  tasks:
+    - include_role:
+        name: install
+        tasks_from: user_setup.yml
+    - include_role:
+        name: install
+        tasks_from: nfs_setup.yml
+
