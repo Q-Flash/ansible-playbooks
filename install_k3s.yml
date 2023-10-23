@@ -1,0 +1,9 @@
+---
+
+- hosts: k3s_servers
+  vars:
+    ansible_host_key_checking: false
+  roles:
+    - role: 'debian/roles/setup'
+    # - role: 'docker/roles/install'
+
