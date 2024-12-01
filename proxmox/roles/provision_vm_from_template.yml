@@ -1,0 +1,59 @@
+- name: Provision Proxmox VM From Template
+  hosts: proxmox_servers
+  vars_prompt:
+    - name: cloudinit_template
+      prompt: "Enter Cloud-init template to use. Default: {{ deploy_vm.default_cloud_init_template }}"
+      default: "{{ deploy_vm.default_cloud_init_template }}"
+      private: false
+    - name: new_vm_cpu_cores
+      prompt: "Number of vCPU cores:"
+      default: "{{ deploy_vm.default_cpu_cores }}"
+      private: false
+    - name: new_vm_memory
+      prompt: "Specify Memory (in MB). Default: {{ deploy_vm.default_memory }}"
+      default: "{{ deploy_vm.default_memory }}"
+      private: false
+    - name: new_vm_storage_pool
+      prompt: "Specify storage pool for disk. Default: {{ deploy_vm.default_storage_pool }}"
+      default: "{{ deploy_vm.default_storage_pool }}"
+      private: false
+    - name: new_vm_disk_size
+      prompt: "Specify disk space. Default: {{ deploy_vm.default_disk_size }}"
+      default: "{{ deploy_vm.default_disk_size }}"
+      private: false
+  tasks:
+    - name: Create VM from cloud-init template
+      command: qm clone {{ cloudinit_template }} {{ new_vm_id }} --name {{ new_vm_name }} --storage {{ new_vm_storage_pool }}
+      become: true
+
+    - name: Set VM memory and CPUs
+      command: qm set {{ new_vm_id }} --memory {{ new_vm_memory }} --cores {{ new_vm_cpu_cores }}
+      become: true
+
+    # - name: Configure VM disk
+    #   command: qm set {{ new_vm_id }} --scsihw virtio-scsi-pci --scsi0 {{ deploy_vm.storage_pool }}:{{ deploy_vm.disk_size }}
+    #   become: true
+
+    - name: Resize Disk
+      command: qm disk resize {{ new_vm_id }} scsi0 {{ new_vm_disk_size }}
+      become: true
+
+    # - name: Configure VM network
+    #   command: qm set {{ new_vm_id }} --net0 virtio,bridge={{ deploy_vm.bridge }}
+    #   become: true
+
+    # - name: Configure Cloud-Init
+    #   command: qm set {{ new_vm_id }} --ipconfig0 ip={{ deploy_vm.network_ip }},gw={{ deploy_vm.network_gateway }} --sshkey "{{ deploy_vm.ssh_key }}"
+    #   become: true
+
+    # - name: Start the VM
+    #   command: qm start {{ new_vm_id }}
+    #   become: true
+
+
+
+
+    - name: Grow Partition
+      command: qm guest exec {{ new_vm_id }} -- growpart /dev/sda 3
+      become: true
+
