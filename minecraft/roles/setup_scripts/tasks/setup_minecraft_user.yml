@@ -1,0 +1,16 @@
+- name: Create minecraft service group
+  become: true
+  group:
+    name: "{{ minecraft_group }}"
+    system: true
+
+- name: Create minecraft service user
+  become: true
+  user:
+    name: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    home: "{{ minecraft_base_dir }}"
+    create_home: true
+    system: true
+    shell: /usr/sbin/nologin
+    state: present

@@ -1,0 +1,44 @@
+---
+- name: Install Adoptium repository prerequisites
+  become: true
+  apt:
+    name:
+      - ca-certificates
+      - gpg
+    state: present
+    update_cache: true
+
+- name: Create APT keyrings directory
+  become: true
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Adoptium signing key
+  become: true
+  get_url:
+    url: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    dest: /etc/apt/keyrings/adoptium.asc
+    mode: "0644"
+
+- name: Add Adoptium repository
+  become: true
+  deb822_repository:
+    name: adoptium
+    types:
+      - deb
+    uris:
+      - https://packages.adoptium.net/artifactory/deb
+    suites:
+      - "{{ ansible_facts['distribution_release'] }}"
+    components:
+      - main
+    signed_by: /etc/apt/keyrings/adoptium.asc
+    state: present
+
+- name: "Install Temurin {{ java_version }}"
+  become: true
+  apt:
+    name: "temurin-{{ java_version }}-jdk"
+    state: present

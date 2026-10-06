@@ -1,11 +1,15 @@
 ---
 # Setup scripts
 
-- name: Install Java 17
-  apt:
-    name: openjdk-11-jdk
-    update_cache: yes
-  become: yes
+- name: Setup minecraft user
+  include_role:
+    name: setup_scripts
+    tasks_from: setup_minecraft_user
+
+- name: "Install Temurin {{ java_version }}"
+  include_role:
+    name: setup_scripts
+    tasks_from: install_java
 
 - name: Ensure service is stopped
   systemd:
@@ -120,6 +124,14 @@
   loop:
     - minecraft.service
   become: yes
+
+- name: Place eula.txt
+  copy:
+    src: "eula.txt"
+    dest: "{{ minecraft_server_dir }}/eula.txt"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: 0664
 
 - name: Start Minecraft service
   systemd:
